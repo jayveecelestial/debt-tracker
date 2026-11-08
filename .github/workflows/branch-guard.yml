@@ -1,0 +1,22 @@
+name: Branch Guard
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  only-develop-to-main:
+    name: only-develop-to-main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require develop as source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REF" != "develop" ] || [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error::Only '${BASE_REPO}:develop' may merge into main (got '${HEAD_REPO}:${HEAD_REF}')."
+            exit 1
+          fi
+          echo "Source branch is develop — OK."
