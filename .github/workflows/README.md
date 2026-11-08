@@ -11,6 +11,7 @@ This directory holds the CI/CD pipeline for `debt-tracker` plus three
 | `ci.yml` | Test, image build on `main` push | Top-level |
 | `cd.yml` | Deploy to Fly.io after CI succeeds on `main` | Top-level |
 | `backup.yml` | Weekly Postgres CSV export to artifact | Top-level |
+| `branch-guard.yml` | Fails PRs into `main` unless the source is `develop` | Top-level |
 | `_python-test.yml` | Generic pytest job (pip cache, JUnit, markers) | Reusable (`workflow_call`) |
 | `_docker-build.yml` | Generic Docker build + optional push | Reusable (`workflow_call`) |
 | `_fly-deploy.yml` | Fly.io deploy + health probe + auto-rollback | Reusable (`workflow_call`) |
@@ -286,6 +287,9 @@ hit. Don't worry about it on `main`.
   branch. Semver tag (`v0.x.y`) created post-deploy by `cd.yml`.
 - **Branching:** Master Jayvee enforces `main` / `develop` / `feature/*`.
   CI runs on every branch; CD runs only when CI succeeds on `main`.
+  Feature branches PR into `develop`; only `develop` may PR into `main`
+  (enforced by `branch-guard.yml` + the `main` ruleset requiring the
+  `only-develop-to-main` check).
 
 ---
 
